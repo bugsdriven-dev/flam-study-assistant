@@ -1,8 +1,15 @@
 // The only function in the whole app that makes a network call.
 // It always talks to OUR backend (/api/generate), never to Groq directly —
 // that's what keeps the API key out of the browser.
+//
+// In dev, VITE_API_URL is unset, so this calls a relative "/api/generate",
+// which Vite's dev proxy (see vite.config.js) forwards to localhost:8787.
+// In production (deployed separately from the backend), VITE_API_URL is
+// set to the deployed backend's full URL at build time.
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 export async function generateStudyMaterial(input) {
-  const res = await fetch("/api/generate", {
+  const res = await fetch(`${API_BASE}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ input }),
